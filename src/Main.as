@@ -29,7 +29,7 @@ package {
 		private function drawBall():void {
 			_ball = new Shape;
 			_ball.graphics.beginFill(0xf567f8);
-			_ball.graphics.drawCircle(30, 300, 20);
+			_ball.graphics.drawCircle(300, 570, 20);
 			_ball.graphics.endFill();
 		}
 		
