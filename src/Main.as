@@ -1,58 +1,102 @@
 package {
+	import com.greensock.TweenMax;
+	import com.greensock.easing.Linear;
+	
 	import flash.display.Shape;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
+	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	
 	[SWF(width=600, height=600, frameRate=25)]
 	
 	public class Main extends Sprite {
 		public var container:Sprite;
-		private var _ball:Shape;
+		private var _ball:Sprite;
 		private var _candraw:Boolean;
-		private var _currentPartPath:Shape;
+		private var _path:Sprite;
+		private var _pathPoints:Vector.<Point>;
 		private var _currentMousePoint:Point;
-		private var ballX:int = 300;
-		private var ballY:int = 570;
+		private static const SPEED:int = 40;
 		
 		public function Main() {
-			container = new Sprite;
 			_candraw = false;
-			_currentPartPath = new Shape;
+			_path = new Sprite;
+			_pathPoints = new Vector.<Point>;
 			drawBall();
-			container.addChild(_ball);
-			stage.addChild(_currentPartPath);
-			this.addChild(container);
+			stage.addChild(_ball);
+			stage.addChild(_path);
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			stage.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 		}
 		
+		/*Ball*/
+		
 		private function drawBall():void {
-			_ball = new Shape;
+			_ball = new Sprite;
 			_ball.graphics.beginFill(0xf567f8);
-			_ball.graphics.drawCircle(ballX, ballY, 20);
+			_ball.graphics.drawCircle(0, 0, 20);
 			_ball.graphics.endFill();
+			_ball.x = 300;
+			_ball.y = 570;
+			_pathPoints.push (new Point(_ball.x, _ball.y));
 		}
 		
+		private function fillBall(color:int):void {
+			var colorInfo:ColorTransform = new ColorTransform;
+			colorInfo.color = color;
+			_ball.transform.colorTransform = colorInfo;
+		}
+		
+		/*Mouse Functions*/
+		
 		private function onMouseDown(event:MouseEvent):void {
-			if ((ballX - _ball.width/2) < event.stageX && event.stageX < (ballX + _ball.width/2) &&
-					(ballY - _ball.height/2) < event.stageY && event.stageY < (ballY + _ball.height/2)) {
+			if ((_ball.x - _ball.width/2) < event.stageX && event.stageX < (_ball.x + _ball.width/2) &&
+					(_ball.y - _ball.height/2) < event.stageY && event.stageY < (_ball.y + _ball.height/2)) {
 				_candraw = true;
+				fillBall(0xFF0000);
 			}
-			_currentPartPath.graphics.moveTo(event.stageX, event.stageY)
-			trace (ballX - _ball.width/2, event.stageX, ballX + _ball.width/2, ballY + _ball.height/2, event.stageY, ballY - _ball.height/2, _candraw);
+			_path.graphics.moveTo(event.stageX, event.stageY);
+			_pathPoints.push(new Point(event.stageX, event.stageY));
 		}
 		
 		private function onMouseMove(event:MouseEvent):void {
 			if (_candraw) {
-				_currentPartPath.graphics.lineTo(event.stageX, event.stageY);
-				_currentPartPath.graphics.lineStyle(5, 0x002FFF);
+				_currentMousePoint = new Point;
+				_currentMousePoint.x = event.stageX;
+				_currentMousePoint.y = event.stageY;
+				_pathPoints.push(_currentMousePoint);
+				_path.graphics.lineStyle(5, 0x002FFF);
+				_path.graphics.lineTo(_currentMousePoint.x, _currentMousePoint.y);
+				trace(_pathPoints.length-1);
 			}
 		}
 		
 		private function onMouseUp(event:MouseEvent):void {
 			_candraw = false;
+			fillBall(0xf567f8);
+			moveToPoint(new Point(_ball.x, _ball.y));
+			/*for each (var point:Point in _pathPoints) {
+				TweenMax.to(_ball, 1.3, {x : point.x, y : point.y, 
+																 ease : Linear.easeNone,
+																 onComplete : function():void {
+																	 fillBall(0xf567f8)}});
+			}*/
+		}
+		
+		/*Movement*/
+		
+		private function moveToPoint(point:Point):void {
+			var distance:int = Math.sqrt((point.x-_ball.x)*(point.x-_ball.x) + (_ball.y - point.y)*(_ball.y - point.y));
+			TweenMax.to(_ball, distance/SPEED, {x : point.x, y : point.y, ease : Linear.easeNone, onComplete : 
+															function():void {
+																var index:int = _pathPoints.indexOf(point);
+																if (index < _pathPoints.length-1) {
+																	moveToPoint(_pathPoints[index+1]);
+																}
+															}
+			})
 		}
 	}
 }
