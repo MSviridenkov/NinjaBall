@@ -8,6 +8,8 @@ package {
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
 	
+	import game.EnemyController;
+	
 	[SWF(width=600, height=600, frameRate=25)]
 	
 	public class Main extends Sprite {
@@ -17,14 +19,17 @@ package {
 		private var _path:Sprite;
 		private var _pathPoints:Vector.<Point>;
 		private var _currentMousePoint:Point;
+		private var _enemyController:EnemyController;
 		private static const SPEED:int = 40;
 		
 		public function Main() {
 			_candraw = false;
 			_path = new Sprite;
 			_pathPoints = new Vector.<Point>;
+			_enemyController = new EnemyController;
 			drawBall();
 			stage.addChild(_ball);
+			stage.addChild(_enemyController.square);
 			stage.addChild(_path);
 			stage.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			stage.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
@@ -35,7 +40,7 @@ package {
 		
 		private function drawBall():void {
 			_ball = new Sprite;
-			_ball.graphics.beginFill(0xf567f8);
+			_ball.graphics.beginFill(0xF567F8);
 			_ball.graphics.drawCircle(0, 0, 20);
 			_ball.graphics.endFill();
 			_ball.x = 300;
@@ -69,23 +74,16 @@ package {
 				_pathPoints.push(_currentMousePoint);
 				_path.graphics.lineStyle(5, 0x002FFF);
 				_path.graphics.lineTo(_currentMousePoint.x, _currentMousePoint.y);
-				trace(_pathPoints.length-1);
 			}
 		}
 		
 		private function onMouseUp(event:MouseEvent):void {
 			_candraw = false;
-			fillBall(0xf567f8);
+			fillBall(0xF567F8);
 			moveToPoint(new Point(_ball.x, _ball.y));
-			/*for each (var point:Point in _pathPoints) {
-				TweenMax.to(_ball, 1.3, {x : point.x, y : point.y, 
-																 ease : Linear.easeNone,
-																 onComplete : function():void {
-																	 fillBall(0xf567f8)}});
-			}*/
 		}
 		
-		/*Movement*/
+		/*Move*/
 		
 		private function moveToPoint(point:Point):void {
 			var distance:int = Math.sqrt((point.x-_ball.x)*(point.x-_ball.x) + (_ball.y - point.y)*(_ball.y - point.y));
