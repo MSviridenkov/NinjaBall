@@ -32,17 +32,26 @@ package game {
 		}
 		
 		private function addSquare():void {
-			for (var i:int = 0; i<15; i++) {
+			for (var i:int = 0; i<30; i++) {
 				square = new Sprite;
 				drawSquare(square);
 				squareMove(square);
 				squares.push(new Sprite);
 				_gameContainer.addChild(square);
+				
 			}
 		}
 		
 		private function squareMove(sq:Sprite):void {
-			tweenSquare = new TweenMax(sq, 1, {x: 560, y: square.y, ease: Linear.easeNone, repeat: -1, yoyo: true});
+			new TweenMax(sq, 1, {x: 560, y: square.y, ease: Linear.easeNone, repeat: -1, yoyo: true});
+		}
+		
+		public function pauseTweens(b:Boolean):void {
+			TweenMax.pauseAll(b);
+		}
+		
+		public function resumeTweens(b:Boolean):void {
+			TweenMax.resumeAll(b);
 		}
 	}
 }

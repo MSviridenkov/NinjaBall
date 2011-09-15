@@ -74,7 +74,7 @@ package game {
 				(_ball.y - _ball.height/2) < event.stageY && event.stageY < (_ball.y + _ball.height/2)) {
 				_candraw = true;
 				fillBall(0xFF0000);
-				_enemyController.tweenSquare.pause();
+				_enemyController.pauseTweens(true);
 			}
 			_path.graphics.moveTo(event.stageX, event.stageY);
 		}
@@ -93,7 +93,7 @@ package game {
 			_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
 			_moving = true;
-			_enemyController.tweenSquare.play();
+			_enemyController.resumeTweens(true);
 		}
 		
 		/*Move*/
