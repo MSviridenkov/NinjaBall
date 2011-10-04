@@ -7,3 +7,4 @@ bin/
 NinjaBall.iml
 .project
 .actionScriptProperties
+.settings/org.eclipse.core.resources.prefs
