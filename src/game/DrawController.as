@@ -13,57 +13,36 @@ package game {
 		private var _path:Sprite;
 		private var _currentMousePoint:Point;
 		private var _mousePoints:Vector.<Point>;
-		private var _gameController:GameController;
+		//private var _gameController:GameController;
 		private var _enemyController:EnemyController;
 		private var _drawContainer:Sprite;
 		private var _gameContainer:Sprite;
-		private var _moving:Boolean;
+		//private var _moving:Boolean;
 		
-		public function DrawController(container:Sprite, enemyController:EnemyController) {
+		public function DrawController(container:Sprite, enemyController:EnemyController, ball:Sprite) {
+			_ball = ball;
 			_drawContainer = new Sprite;
 			_gameContainer = container;
 			_enemyController = enemyController;
-			_moving = false;
+			//_moving = false;
 			_candraw = false;
 			_path = new Sprite;
 			_mousePoints = new Vector.<Point>;
-			drawBall();
 			_drawContainer.addChild(_path);
 			_gameContainer.addChild(_drawContainer);
-			_gameContainer.addChild(_ball);
 			_gameContainer.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			_gameContainer.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			_gameContainer.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
-			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrame)
+			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrameFirst);
+			trace ("length: ",_enemyController.squares.length);
 		}
 		
 		/*Ball*/
-		
-		private function drawBall():void {
-			_ball = new Sprite;
-			_ball.graphics.beginFill(0xF567F8);
-			_ball.graphics.drawCircle(0, 0, 20);
-			_ball.graphics.endFill();
-			_ball.x = 300;
-			_ball.y = 570;
-		}
 		
 		private function fillBall(color:int):void {
 			var colorInfo:ColorTransform = new ColorTransform;
 			colorInfo.color = color;
 			_ball.transform.colorTransform = colorInfo;
-		}
-		
-		private function removeBall():void {
-			_moving = false;
-			_gameContainer.removeChild(_ball);
-			TweenMax.killTweensOf(_ball);
-		}
-		
-		private function checkBallHitSquare():void {
-			if (_ball.hitTestObject(_enemyController.square)) {
-				removeBall();
-			}
 		}
 		
 		/*Mouse Functions*/
@@ -74,7 +53,11 @@ package game {
 				(_ball.y - _ball.height/2) < event.stageY && event.stageY < (_ball.y + _ball.height/2)) {
 				_candraw = true;
 				fillBall(0xFF0000);
+<<<<<<< HEAD
 				_enemyController.pauseTweens(true);
+=======
+				TweenMax.pauseAll(true);
+>>>>>>> Traps are moving. Ball is removed, when it hits something trap.
 			}
 			_path.graphics.moveTo(event.stageX, event.stageY);
 		}
@@ -90,10 +73,14 @@ package game {
 		private function onMouseUp(event:MouseEvent):void {
 			_candraw = false;
 			fillBall(0xF567F8);
-			_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameFirst);
 			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
+<<<<<<< HEAD
 			_moving = true;
 			_enemyController.resumeTweens(true);
+=======
+			TweenMax.resumeAll(true);
+>>>>>>> Traps are moving. Ball is removed, when it hits something trap.
 		}
 		
 		/*Move*/
@@ -112,7 +99,7 @@ package game {
 		
 		/*Enter Frame*/
 		
-		private function onEnterFrame(event:Event):void {
+		private function onEnterFrameFirst(event:Event):void {
 			if (_currentMousePoint != null) {
 				_mousePoints.push(_currentMousePoint);
 			}
@@ -122,9 +109,23 @@ package game {
 			if (!_mousePoints || _mousePoints.length == 0) {return; }
 			const point:Point = _mousePoints[0];
 			_mousePoints.shift();
-			checkBallHitSquare();
 			_ball.x = point.x;
 			_ball.y = point.y;
+			checkBallHitSquare();
+		}
+		
+		private function checkBallHitSquare():void {
+			for each (var square:Sprite in _enemyController.squares) {
+				if (_ball.hitTestObject(square) == true) {
+					_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
+					_gameContainer.removeChild(_ball); //удаляет шарик
+					_gameContainer.removeChild(_drawContainer); //удаляет линию
+				}
+			}
+		}
+		
+		public function removeSecondListener():void {
+			_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
 		}
 	}
 }

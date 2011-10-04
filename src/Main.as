@@ -1,11 +1,8 @@
 package {
 	import flash.display.Sprite;
-	
-	import game.DrawController;
-	import game.EnemyController;
 	import game.GameController;
 	
-	[SWF(width=600, height=600, frameRate=25)]
+	[SWF(width=600, height=600, frameRate=60)]
 	
 	public class Main extends Sprite {
 		private var gameContainer:Sprite;
