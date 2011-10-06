@@ -53,11 +53,7 @@ package game {
 				(_ball.y - _ball.height/2) < event.stageY && event.stageY < (_ball.y + _ball.height/2)) {
 				_candraw = true;
 				fillBall(0xFF0000);
-<<<<<<< HEAD
-				_enemyController.pauseTweens(true);
-=======
 				TweenMax.pauseAll(true);
->>>>>>> Traps are moving. Ball is removed, when it hits something trap.
 			}
 			_path.graphics.moveTo(event.stageX, event.stageY);
 		}
@@ -75,12 +71,7 @@ package game {
 			fillBall(0xF567F8);
 			_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameFirst);
 			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
-<<<<<<< HEAD
-			_moving = true;
-			_enemyController.resumeTweens(true);
-=======
 			TweenMax.resumeAll(true);
->>>>>>> Traps are moving. Ball is removed, when it hits something trap.
 		}
 		
 		/*Move*/
