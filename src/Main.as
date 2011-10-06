@@ -1,6 +1,6 @@
 package {
-	import flash.display.Sprite;
 	import game.GameController;
+	import flash.display.Sprite;
 	
 	[SWF(width=600, height=600, frameRate=60)]
 	

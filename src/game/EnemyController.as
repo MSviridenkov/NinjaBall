@@ -12,18 +12,14 @@ package game {
 		private var speeds:Vector.<int>;
 		private var squareSpeed:int;
 		private var randoms:Vector.<int>;
-		//private var _timer:Timer;
 		
 		public function EnemyController(container:Sprite) {
 			_gameContainer = container;
-			//squareSpeed = 3;
 			squares = new Vector.<Sprite>;
 			randoms = new Vector.<int>;
-			//speeds = new Vector.<int>;
+			
 			random();
 			addSquare();
-			//createSquareSpeed();
-			//_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
 		private function drawSquare(sq:Sprite, j:int):void {
@@ -32,8 +28,7 @@ package game {
 			sq.graphics.drawRect(0, 0, 40, 40);
 			sq.graphics.endFill();
 			sq.x = Math.random() * 560;
-			sq.y = randoms[i];//Math.random() * 500;
-			trace ("random:", randoms[i]);
+			sq.y = randoms[i];
 		}
 		
 		private function addSquare():void {
@@ -43,8 +38,6 @@ package game {
 				squareTween(square);
 				squares.push(square);
 				_gameContainer.addChild(square);
-				//trace (i, squares.indexOf(square));
-				trace(square.y);
 			}
 		}
 		
@@ -58,11 +51,6 @@ package game {
 			while (distance < 100);
 			var speed:Number = Math.random()*150 + 50;
 			var time:Number = distance/speed;
-			/*trace ("start x:", sq.x);
-			trace ("finish x:", finishX);
-			trace ("time:", time);
-			trace ("speed:", speed)
-			trace ("distance", distance, "\n");*/
 			new TweenMax(sq, time, {x: finishX, y: square.y, ease: Linear.easeNone, repeat: -1, yoyo: true});
 		}
 		
@@ -96,16 +84,10 @@ package game {
 				while (canEnd != true);
 				randoms.push(tempRnd);
 			}
-			trace ("randoms:", randoms);
-		}
-		
-		private function onEnterFrame(event:Event):void {
-			squareMove();
 		}
 		
 		private function squareMove():void {
 			for each (var square:Sprite in squares) {
-				//squareSpeed = speeds[squares.indexOf(square)];
 				if (square.x > 560) {
 					squareSpeed = -speeds[squares.indexOf(square)];
 				}
@@ -113,7 +95,6 @@ package game {
 					squareSpeed = speeds[squares.indexOf(square)];
 				}
 				square.x += squareSpeed;
-				//trace ("square", squares.indexOf(square) + 1, "x:", square.x, "speed:", squareSpeed);
 			}
 		}
 		
@@ -122,7 +103,6 @@ package game {
 				var rnd:int = Math.random() * 5 + 1;
 				speeds.push (rnd);
 			}
-			trace ("speeds", speeds);
 		}
 	}
 }
