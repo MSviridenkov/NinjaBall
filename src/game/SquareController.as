@@ -5,21 +5,26 @@ package game {
 	
 	import flash.display.Sprite;
 
-	public class EnemyController {
+	public class SquareController {
 		public var square:Sprite;
 		public var squares:Vector.<Sprite>;
 		private var _gameContainer:Sprite;
 		private var speeds:Vector.<int>;
 		private var squareSpeed:int;
 		private var randoms:Vector.<int>;
+		private var _cloudController:CloudController;
 		
-		public function EnemyController(container:Sprite) {
+		
+		public function SquareController(container:Sprite, cloudController:CloudController) {
 			_gameContainer = container;
+			_cloudController = cloudController;
 			squares = new Vector.<Sprite>;
 			randoms = new Vector.<int>;
 			
 			random();
 			addSquare();
+			
+			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrame)
 		}
 		
 		private function drawSquare(sq:Sprite, j:int):void {
@@ -51,7 +56,14 @@ package game {
 			while (distance < 100);
 			var speed:Number = Math.random()*150 + 50;
 			var time:Number = distance/speed;
-			new TweenMax(sq, time, {x: finishX, y: square.y, ease: Linear.easeNone, repeat: -1, yoyo: true});
+			trace ("old speed:", time);
+			new TweenMax(sq, time, {x: finishX, y: square.y, ease: Linear.easeNone, repeat: -1, yoyo: true, 
+									onUpdate: function():void {
+												if (sq.hitTestObject(_cloudController._cloud)) {
+													time = (distance/speed)/2;
+													trace("new speed:", time);
+													}
+											  }});
 		}
 		
 		private function random():void {
@@ -84,6 +96,19 @@ package game {
 				while (canEnd != true);
 				randoms.push(tempRnd);
 			}
+		}
+		
+		private function checkSquareHitCloud(speed:Number):void {
+			//for each (var square:Sprite in squares) {
+				if (square.hitTestObject(_cloudController._cloud)) {
+					//speed = speed/2;
+					trace ("check");
+				}
+			//}
+		}
+		
+		private function onEnterFrame(event:Event):void {
+			
 		}
 		
 		private function squareMove():void {

@@ -9,7 +9,8 @@ package game {
 
 	public class GameController {
 		private var _gameContainer:Sprite;
-		private var _enemyController:EnemyController;
+		private var _squareController:SquareController;
+		private var _cloudController:CloudController;
 		
 		private var _ball:Sprite;
 		private var _candraw:Boolean;
@@ -21,7 +22,8 @@ package game {
 		public function GameController(container:Sprite) {
 			_gameContainer = container;
 			_drawContainer = new Sprite;
-			_enemyController = new EnemyController(_gameContainer);
+			_cloudController = new CloudController(_gameContainer);
+			_squareController = new SquareController(_gameContainer, _cloudController);
 			_path = new Sprite;
 			_mousePoints = new Vector.<Point>;
 			_candraw = false;
@@ -29,9 +31,9 @@ package game {
 			drawBall();
 			drawSquareOnContainer();
 			
-			_gameContainer.addChild(_ball);
 			_drawContainer.addChild(_path);
 			_gameContainer.addChild(_drawContainer);
+			_gameContainer.addChild(_ball);
 			_gameContainer.addEventListener(MouseEvent.MOUSE_DOWN, onMouseDown);
 			_gameContainer.addEventListener(MouseEvent.MOUSE_MOVE, onMouseMove);
 			_gameContainer.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
@@ -110,7 +112,7 @@ package game {
 		/*Functions*/
 		
 		private function checkBallHitSquare():void {
-			for each (var square:Sprite in _enemyController.squares) {
+			for each (var square:Sprite in _squareController.squares) {
 				if (_ball.hitTestObject(square) == true) {
 					_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
 					_gameContainer.removeChild(_ball); //удаляет шарик
