@@ -10,7 +10,7 @@ package game {
 	public class GameController {
 		private var _gameContainer:Sprite;
 		private var _squareController:SquareController;
-		private var _cloudController:CloudController;
+		private var _crossController:CrossController;
 		
 		private var _ball:Sprite;
 		private var _candraw:Boolean;
@@ -22,8 +22,8 @@ package game {
 		public function GameController(container:Sprite) {
 			_gameContainer = container;
 			_drawContainer = new Sprite;
-			_cloudController = new CloudController(_gameContainer);
-			_squareController = new SquareController(_gameContainer, _cloudController);
+			_squareController = new SquareController(_gameContainer);
+			_crossController = new CrossController(_gameContainer);
 			_path = new Sprite;
 			_mousePoints = new Vector.<Point>;
 			_candraw = false;
@@ -74,6 +74,7 @@ package game {
 				TweenMax.pauseAll(true);
 			}
 			_path.graphics.moveTo(event.stageX, event.stageY);
+			_crossController.stopCrossRot();
 		}
 		
 		private function onMouseMove(event:MouseEvent):void {
@@ -90,6 +91,7 @@ package game {
 			_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameFirst);
 			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
 			TweenMax.resumeAll(true);
+			_crossController.startCrossRot();
 		}
 		
 		/*Enter Frame*/
@@ -106,14 +108,31 @@ package game {
 			_mousePoints.shift();
 			_ball.x = point.x;
 			_ball.y = point.y;
-			checkBallHitSquare();
+			checkObjectsHitSquare(new Point(_ball.x, _ball.y));
 		}
 		
 		/*Functions*/
 		
-		private function checkBallHitSquare():void {
+		private function checkObjectsHitSquare(p:Point):void {
 			for each (var square:Sprite in _squareController.squares) {
 				if (_ball.hitTestObject(square) == true) {
+					_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
+					_gameContainer.removeChild(_ball); //удаляет шарик
+					_gameContainer.removeChild(_drawContainer); //удаляет линию
+				}
+			}
+			var point:Point = p;
+			var num:int = (Math.SQRT2)/2*10;
+			trace ("A:", point.x, point.y, "---", point.x+num, point.y+num, "num:", num);
+			for each (var cross:Sprite in _crossController.crosses) {
+				if (cross.hitTestPoint(point.x+10, point.y+10, true) == true ||//П/2
+					cross.hitTestPoint(point.x+10, point.y-10, true) == true ||
+					cross.hitTestPoint(point.x-10, point.y+10, true) == true ||
+					cross.hitTestPoint(point.x-10, point.y-10, true) == true 
+					//cross.hitTestPoint(point.x+num, point.y+num, true) == true ||//П/4
+					//cross.hitTestPoint(point.x+num, point.y-num, true) == true ||
+					//cross.hitTestPoint(point.x-num, point.y+num, true) == true ||
+					/*cross.hitTestPoint(point.x-num, point.y-num, true) == true*/) {
 					_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrameSecond);
 					_gameContainer.removeChild(_ball); //удаляет шарик
 					_gameContainer.removeChild(_drawContainer); //удаляет линию
