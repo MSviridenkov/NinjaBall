@@ -8,6 +8,7 @@ package game {
 	public class SquareController {
 		public var square:Sprite;
 		public var squares:Vector.<Sprite>;
+		
 		private var _gameContainer:Sprite;
 		private var speeds:Vector.<int>;
 		private var squareSpeed:int;
@@ -53,7 +54,6 @@ package game {
 			while (distance < 100);
 			var speed:Number = Math.random()*150 + 50;
 			var time:Number = distance/speed;
-			trace ("old speed:", time);
 			new TweenMax(sq, time, {x: finishX, y: square.y, ease: Linear.easeNone, repeat: -1, yoyo: true});
 		}
 		

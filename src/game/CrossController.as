@@ -3,10 +3,10 @@ package game {
 	import flash.events.Event;
 
 	public class CrossController extends Sprite {
+		public var crosses:Vector.<Sprite>;
+		
 		private var _cross:Sprite;
 		private var _gameContainer:Sprite;
-		
-		public var crosses:Vector.<Sprite>;
 		
 		public function CrossController(container:Sprite) {
 			_gameContainer = container;
@@ -21,8 +21,6 @@ package game {
 				createCross(_cross, i);
 				crosses.push(_cross);
 				_gameContainer.addChild(_cross);
-				trace(_cross.x, _cross.y, _cross.rotation);
-				trace (crosses.indexOf(_cross));
 			}
 		}
 		
@@ -33,9 +31,10 @@ package game {
 		
 		private function createCross(cross:Sprite, i:int):void {
 			cross.graphics.beginFill(0x996600);
-			cross.graphics.drawRect(-15, -100, 30, 200);
 			cross.graphics.drawRect(-100, -15, 200, 30);
-			cross.graphics.drawRect(-15, -15, 30, 30);
+			cross.graphics.endFill();
+			cross.graphics.beginFill(0x996600);
+			cross.graphics.drawRect(-15, -100, 30, 200);
 			cross.graphics.endFill();
 			cross.x = 200 + i*200;//Math.random() * 200 + 200;
 			cross.y = 200 + i*200;//Math.random() * 200 + 200;
