@@ -24,23 +24,40 @@ package game {
 			
 			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrame)
 		}
-		
+
+		public function remove():void {
+			_gameContainer.removeEventListener(Event.ENTER_FRAME, onEnterFrame)
+			removeSquare();
+		}
+
+		private function createSquare(i:int):Sprite {
+			var result:Sprite = new SquareView();
+			result.x = Math.random() * 560;
+			result.y = randoms[i];
+			return result;
+		}
+/*
 		private function drawSquare(sq:Sprite, j:int):void {
-			var i:int = j;
 			sq.graphics.beginFill(Math.random() * 0xFFFFFF);
 			sq.graphics.drawRect(0, 0, 40, 40);
 			sq.graphics.endFill();
 			sq.x = Math.random() * 560;
-			sq.y = randoms[i];
+			sq.y = randoms[j];
 		}
+		*/
 		
 		private function addSquare():void {
 			for (var i:int = 0; i<3; i++) {
-				square = new Sprite;
-				drawSquare(square, i);
+				square = createSquare(i);
 				squareTween(square);
 				squares.push(square);
 				_gameContainer.addChild(square);
+			}
+		}
+
+		private function removeSquare():void {
+			for each (var square:Sprite in squares) {
+				if (_gameContainer.contains(square)) { _gameContainer.removeChild(square); }
 			}
 		}
 		

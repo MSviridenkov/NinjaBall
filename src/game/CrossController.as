@@ -2,10 +2,11 @@ package game {
 	import flash.display.Sprite;
 	import flash.events.Event;
 
-	public class CrossController extends Sprite {
+import game.gameobject.Mill;
+
+public class CrossController {
 		public var crosses:Vector.<Sprite>;
 		
-		private var _cross:Sprite;
 		private var _gameContainer:Sprite;
 		
 		public function CrossController(container:Sprite) {
@@ -14,31 +15,39 @@ package game {
 			addCross();
 			startCrossRot();
 		}
+
+		public function remove() {
+			stopCrossRot();
+			removeCross();
+		}
 		
 		private function addCross():void {
+			var cross:Sprite;
 			for (var i:int = 0; i < 2; i++) {
-				_cross = new Sprite;
-				createCross(_cross, i);
-				crosses.push(_cross);
-				_gameContainer.addChild(_cross);
+				cross = new Sprite;
+				cross = createCross(i);
+				crosses.push(cross);
+				_gameContainer.addChild(cross);
 			}
 		}
+
+	private function removeCross():void {
+		for each (var cross:Sprite in crosses) {
+			if (_gameContainer.contains(cross)) { _gameContainer.removeChild(cross); }
+		}
+	}
 		
 		private function onEnterFrame(event:Event):void {
 			crosses[0].rotation+=.15;
 			crosses[1].rotation+=.5;
 		}
 		
-		private function createCross(cross:Sprite, i:int):void {
-			cross.graphics.beginFill(0x996600);
-			cross.graphics.drawRect(-100, -15, 200, 30);
-			cross.graphics.endFill();
-			cross.graphics.beginFill(0x996600);
-			cross.graphics.drawRect(-15, -100, 30, 200);
-			cross.graphics.endFill();
-			cross.x = 200 + i*200;//Math.random() * 200 + 200;
-			cross.y = 200 + i*200;//Math.random() * 200 + 200;
-			cross.rotation = Math.random() * 360;
+		private function createCross(i:int):Sprite {
+			var result:Sprite = new Mill();
+			result.x = 120 + i*360;
+			result.y = 200 + i*170;
+			result.rotation = Math.random() * 360;
+			return result;
 		}
 		
 		public function stopCrossRot():void {

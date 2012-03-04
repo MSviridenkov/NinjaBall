@@ -1,5 +1,4 @@
 package game.matrix {
-	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	
 	public class MatrixMap {
@@ -10,20 +9,16 @@ package game.matrix {
 		
 		private var _matrix:Vector.<Vector.<uint>>;
 		private var _gameContainer:Sprite;
-		//private var _wallBitmapData:BitmapData;
 		
 		public function MatrixMap(container:Sprite) {
 			_gameContainer = container;
-			//_wallBitmapData = new BitmapData(50, 50, false, 0xf56a78);
-			//trace ("bum", _wallBitmapData.getPixel(1,1));
 			createMatrix();
-			traceMatrix();
 			for (var i:int = 0; i < MATRIX_HEIGHT; i++) {
 				for (var j:int = 0; j < MATRIX_WIDTH; j++) {
 					if (_matrix[i][j] == MatrixItemIds.EMPTY) {
 					}
 					if (_matrix[i][j] == MatrixItemIds.STONE) {
-						createStone(j, i);
+						//createStone(j, i);
 					}
 				}
 			}
@@ -47,20 +42,11 @@ package game.matrix {
 			if (!stones) {stones = new Vector.<Sprite>};
 			stone.x = x*50;
 			stone.y = y*50;
-			/*stone.graphics.beginBitmapFill(_wallBitmapData);
-			stone.graphics.drawRect(0, 0, 50, 50);
-			stone.graphics.endFill();*/
 			stone.graphics.beginFill(0xf56a78);
 			stone.graphics.drawRect(0, 0, 50, 50);
 			stone.graphics.endFill();
 			stones.push(stone);
 			_gameContainer.addChild(stone);
-		}
-		
-		private function traceMatrix():void {
-			for each (var vect:Vector.<uint> in _matrix) {
-				//trace (vect); Вывод матрицы!!!
-			}
 		}
 	}
 }
