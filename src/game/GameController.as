@@ -48,7 +48,7 @@ import game.matrix.MatrixMap;
 			_walls = createWalls();
 			_finishSquare = createFinishSquare()
 		}
-		
+
 		private function drawSquareOnContainer():void {
 			_gameContainer.graphics.beginFill(0xFFFFFF);
 			_gameContainer.graphics.drawRect(0, 0, 600, 600);
@@ -98,9 +98,9 @@ import game.matrix.MatrixMap;
 		private function createFinishSquare():Sprite {
 			var result:Sprite = new Sprite();
 			result.graphics.beginFill(0x000000, .3);
-			result.graphics.drawRect(0, 0, 200, 20);
+			result.graphics.drawRect(0, 0, 100, 20);
 			result.graphics.endFill();
-			result.addChild(createTextField("FINISH", 80, 5));
+			result.addChild(createTextField("FINISH", 30, 0));
 			result.y = 10;
 			return result;
 		}
@@ -125,7 +125,7 @@ import game.matrix.MatrixMap;
 			wall = new WallView();
 			wall.y = Main.HEIGHT - wall.height;
 			result.addChild(wall);
-
+			
 			return result;
 		}
 		
@@ -248,7 +248,7 @@ import game.matrix.MatrixMap;
 		}
 		
 		private function checkObjectsHitBall(point:Point):Boolean {
-			return (checkSquares(point) || checkSquares(point));
+			return (checkSquares(point) || checkCrossesHitBall(point));
 		}
 
 		private function checkSquares(point:Point):Boolean {
@@ -264,10 +264,10 @@ import game.matrix.MatrixMap;
 		private function checkCrossesHitBall(point:Point):Boolean {
 			var result:Boolean = false;
 			for each (var cross:Sprite in _crossController.crosses) {
-				if (cross.hitTestPoint(point.x+10, point.y+10, true) == true ||
-						cross.hitTestPoint(point.x+10, point.y-10, true) == true ||
-						cross.hitTestPoint(point.x-10, point.y+10, true) == true ||
-						cross.hitTestPoint(point.x-10, point.y-10, true) == true) {
+				if (cross.hitTestPoint(point.x + _ball.width/2, point.y + _ball.height/2, true) == true ||
+						cross.hitTestPoint(point.x + _ball.width/2, point.y - _ball.height/2, true) == true ||
+							cross.hitTestPoint(point.x - _ball.width/2, point.y + _ball.height/2, true) == true ||
+								cross.hitTestPoint(point.x -_ball.width/2, point.y - _ball.height/2, true) == true) {
 
 					result = true;
 				}

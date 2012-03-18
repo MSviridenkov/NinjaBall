@@ -12,17 +12,12 @@ public class Menu extends EventDispatcher implements IController {
 	private var _gameContainer:Sprite;
 	private var _menuContainer:Sprite;
 	private var _startButton:StartButtonView;
-	private var _downState:Sprite;
-	private var _overState:Sprite;
-	private var _upState:Sprite;
-	public var gameState:String;
 
 	private const GLOW_FILTER:GlowFilter = new GlowFilter(0x000000, .5);
 
 	public function Menu(container:Sprite) {
 		_gameContainer = container;
 		_menuContainer = new Sprite();
-		drawStates();
 		_startButton = new StartButtonView();
 		_startButton.gameTxt.text = "START";
 		var menuView:MenuView = new MenuView();
@@ -43,21 +38,6 @@ public class Menu extends EventDispatcher implements IController {
 
 	public function close():void {
 		_gameContainer.removeChild(_menuContainer);
-	}
-
-	private function drawStates():void {
-		_downState = new Sprite;
-		_overState = new Sprite;
-		_upState = new Sprite;
-		_downState.graphics.beginFill(0xFF0000);
-		_downState.graphics.drawRect(0, 0, 100, 30);
-		_downState.graphics.endFill();
-		_overState.graphics.beginFill(0x00FF00);
-		_overState.graphics.drawRect(0, 0, 100, 30);
-		_overState.graphics.endFill();
-		_upState.graphics.beginFill(0x0000FF);
-		_upState.graphics.drawRect(0, 0, 100, 30);
-		_upState.graphics.endFill();
 	}
 
 	private function onMouseClick(event:MouseEvent):void {

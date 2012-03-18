@@ -9,7 +9,7 @@ import game.event.ControllerActionListener;
 [SWF(width=600, height=600, frameRate=60)]
 	
 public class Main extends Sprite {
-	var _mochiads_game_id:String = "c476fc4588090ec2";
+	var _mochiads_game_id:String = "c476fc4588090ec2"
 
 	public var gameContainer:Sprite;
 	public var upContainer:Sprite;

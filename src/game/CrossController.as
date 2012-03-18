@@ -8,22 +8,25 @@ public class CrossController {
 		public var crosses:Vector.<Sprite>;
 		
 		private var _gameContainer:Sprite;
+		private var _rotations:Vector.<Number>;
+		private var _numCrosses:Number = Math.round(Math.random() * 4 + 2);
 		
 		public function CrossController(container:Sprite) {
 			_gameContainer = container;
 			crosses = new Vector.<Sprite>;
+			_rotations = new Vector.<Number>;
 			addCross();
 			startCrossRot();
 		}
 
-		public function remove() {
+		public function remove():void {
 			stopCrossRot();
 			removeCross();
 		}
 		
 		private function addCross():void {
 			var cross:Sprite;
-			for (var i:int = 0; i < 2; i++) {
+			for (var i:int = 0; i < 5; i++) {
 				cross = new Sprite;
 				cross = createCross(i);
 				crosses.push(cross);
@@ -38,14 +41,20 @@ public class CrossController {
 	}
 		
 		private function onEnterFrame(event:Event):void {
-			crosses[0].rotation+=.15;
-			crosses[1].rotation+=.5;
+			//crosses[0].rotation+=.15;
+			//crosses[1].rotation += .5;
+			//crosses[2].rotation += .8;
+			for (var i:int = 0; i < crosses.length; i++)
+			{
+				crosses[i].rotation += _rotations[i];
+			}
 		}
 		
 		private function createCross(i:int):Sprite {
 			var result:Sprite = new Mill();
-			result.x = 120 + i*360;
-			result.y = 200 + i*170;
+			result.x = Math.random() * 520 + 55; //120 + i*360;
+			result.y = Math.random() * 450 + 55;//200 + i*170;
+			_rotations.push(Math.random() * 1);
 			result.rotation = Math.random() * 360;
 			return result;
 		}
