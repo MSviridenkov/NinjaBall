@@ -81,7 +81,7 @@ import game.matrix.MatrixMap;
 
 		public function close():void {
 			_drawingController.removeListeners();
-			_drawingController.removeAllParts();
+			_drawingController.clear();
 			_squareController.remove();
 			_crossController.remove();
 			if (_drawContainer.contains(_path)) { _drawContainer.removeChild(_path); }
@@ -165,6 +165,7 @@ import game.matrix.MatrixMap;
 			if (_gameState == STATE_DRAW) {
 				if (!_mousePoints || _currentMousePoints.length == 0 ) {return; }
 				_mousePoints.push(_currentMousePoints[0]);
+				_drawingController.drawPathToCurrentPoint(_currentMousePoints[0]);
 			}
 			if (_gameState == STATE_MOVE) {
 				if (!_mousePoints || _mousePoints.length == 0) {
@@ -172,14 +173,13 @@ import game.matrix.MatrixMap;
 					return;
 				}
 				//_drawingController.removePointsAroundNinja();
-				const point:Point = _mousePoints[0];
-				_mousePoints.shift();
+				const point:Point = _mousePoints.shift();
 				_ball.x = point.x;
 				_ball.y = point.y;
+				_drawingController.removePathPartByMousePoint(point);
 				if (checkObjectsHitBall(new Point(_ball.x, _ball.y))) {
 					openEndWindow(false);
-				}
-				if (checkForFinish()) {
+				} else if (checkForFinish()) {
 					openEndWindow(true);
 				}
 			}
