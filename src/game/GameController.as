@@ -15,7 +15,13 @@ import game.event.ControllerActionListener;
 
 import game.matrix.MatrixMap;
 
-	public class GameController extends EventDispatcher implements IController {
+import mochi.as3.MochiDigits;
+import mochi.as3.MochiScores;
+
+public class GameController extends EventDispatcher implements IController {
+		var o:Object = { n: [4, 6, 13, 10, 2, 12, 9, 8, 8, 1, 12, 6, 5, 4, 7, 4], f: function (i:Number,s:String):String { if (s.length == 16) return s; return this.f(i+1,s + this.n[i].toString(16));}};
+		var boardID:String = o.f(0,"");
+
 		private var _gameContainer:Sprite;
 		private var _squareController:SquareController;
 		private var _crossController:CrossController;
@@ -35,6 +41,8 @@ import game.matrix.MatrixMap;
 		private var _drawingController:DrawingController;
 
 		private var _win:Boolean;
+
+		private var _gameStartTime:Number;
 
 		private const STATE_MOVE:uint = 0;
 		private const STATE_DRAW:uint = 1;
@@ -56,6 +64,7 @@ import game.matrix.MatrixMap;
 		}
 
 		public function open():void {
+			_gameStartTime = new Date().getTime();
 			_drawingController.addListeners();
 			_mousePoints = new Vector.<Point>;
 			_currentMousePoints = new Vector.<Point>;
@@ -226,7 +235,20 @@ import game.matrix.MatrixMap;
 			trace("end window click");
 			_endWindow.removeEventListener(MouseEvent.CLICK, onEndWindowClick);
 			_gameContainer.removeChild(_endWindow);
-			endGame();
+			var scoreMilliseconds:int = new Date().getTime() - _gameStartTime;
+			trace("score milliseconds : " + scoreMilliseconds);
+
+			if (Main.MOCHI_ON && _win) {
+				var mochiScore:MochiDigits = new MochiDigits();
+				mochiScore.value = scoreMilliseconds/1000.;
+				MochiScores.showLeaderboard({
+					boardID: boardID,
+					score: mochiScore.value,
+					onClose: endGame()
+				});
+			} else { endGame(); }
+
+			//endGame();
 		}
 
 		private function createTextField(text:String, x:Number, y:Number):TextField {

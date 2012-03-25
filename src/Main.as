@@ -1,10 +1,13 @@
 package {
 import flash.display.Sprite;
 	import flash.events.Event;
-	
-	import game.GameController;
+import flash.system.Security;
+
+import game.GameController;
 	import game.Menu;
 import game.event.ControllerActionListener;
+
+import mochi.as3.MochiServices;
 
 [SWF(width=600, height=600, frameRate=60)]
 	
@@ -20,7 +23,14 @@ public class Main extends Sprite {
 	public static const WIDTH:int = 600;
 	public static const HEIGHT:int = 600;
 
+	public static var MOCHI_ON:Boolean = true;
+
 	public function Main() {
+		Security.allowDomain("*");
+		Security.allowInsecureDomain("*");
+		Security.allowDomain("http://www.mochiads.com/static/lib/services/");
+
+		MochiServices.connect(_mochiads_game_id, root, onMochiConnectError);
 		gameContainer = new Sprite;
 		addChild(gameContainer);
 		_menuController = new Menu(gameContainer);
@@ -45,6 +55,11 @@ public class Main extends Sprite {
 	private function onGameOpen(event:ControllerActionListener):void {
 		_gameController.close();
 		_gameController.open();
+	}
+
+	private function onMochiConnectError():void {
+		MOCHI_ON = false;
+		trace("Mochi connect fails");
 	}
 		
 }
