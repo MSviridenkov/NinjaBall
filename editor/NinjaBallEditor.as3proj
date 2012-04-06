@@ -54,6 +54,7 @@
     <element path="lib\panels.swc" />
     <element path="lib\components.swc" />
     <element path="lib\GUIninja.swc" />
+    <element path="lib\greensock.swc" />
   </libraryPaths>
   <!-- External Libraries -->
   <externalLibraryPaths>
