@@ -9,10 +9,14 @@ package view
 	import flash.events.KeyboardEvent;
 	import flash.events.MouseEvent;
 	import flash.filters.GlowFilter;
+	import flash.geom.Point;
 	import flash.ui.Keyboard;
 	import model.EditorModel;
+	import model.IDItems;
 	import view.cell.Cell;
 import view.obstacle.ObstacleItem;
+import view.obstacle.PathPart;
+import view.obstacle.SquareObstacle;
 import view.panel.ItemsPanel;
 import view.panel.OptionsPanel;
 
@@ -25,9 +29,10 @@ import view.panel.OptionsPanel;
 		private var _model:EditorModel;
 		private var _container:Stage;
 		private var _grid:Sprite;
+		private var _pathContainer:Sprite;
 		private var _cells:Vector.<Cell>;
 		private var _items:Vector.<ObstacleItem>;
-		private var _draggedItem:ObstacleItem;
+		private var _selectedItem:ObstacleItem;
 		private var _itemsPanel:ItemsPanel;
 		private var _optionsPanel:OptionsPanel;
 		
@@ -38,17 +43,20 @@ import view.panel.OptionsPanel;
 		public function EditorView(model:model.EditorModel, container:Stage) {
 			_model = model;
 			_container = container;
+			_pathContainer = new Sprite();
 			init();
 		}
 
 		public function init():void {
 			createGrid();
+			this.addChild(_pathContainer);
 			createItemsPanel();
 			createOptionsPanel();
 			addListeners();
 		}
 		public function clear():void {
 			removeListeners();
+			this.removeChild(_pathContainer);
 			var len:int = this.numChildren;
 			while (len > 0) { this.removeChildAt(0); len--; }
 		}
@@ -72,6 +80,7 @@ import view.panel.OptionsPanel;
 				for (var j:int = 0; j < CELLS_NUM; j++)
 				{
 					var cell:Cell = new Cell(i, j);
+					cell.addEventListener(MouseEvent.CLICK, onCellClick);
 					cell.x = CELL_WIDTH * j;
 					cell.y = CELL_WIDTH * i;
 					_cells.push(cell);
@@ -80,6 +89,28 @@ import view.panel.OptionsPanel;
 			}
 			this.addChild(_grid);
 		}
+		
+		private function onCellClick(event:MouseEvent):void {
+				if (_selectedItem && _selectedItem.type == IDItems.CUBE) {
+					var selectedItem:SquareObstacle = _selectedItem as SquareObstacle;
+					var fromPoint:Point;
+					var cell:Cell = event.target as Cell;
+					if (selectedItem.getLastPathPart()) {
+						fromPoint = new Point(selectedItem.getLastPathPart().movePoint.x,
+																	selectedItem.getLastPathPart().movePoint.y);
+					} else {
+						fromPoint = new Point(selectedItem.x, selectedItem.y);
+					}
+					var pathPart:PathPart = new PathPart(fromPoint, new Point(cell.x + cell.width / 2, cell.y + cell.height / 2));
+					selectedItem.addPathPart(pathPart);
+					_pathContainer.addChild(pathPart.weight);
+					_pathContainer.addChild(pathPart.movePoint);
+					if (selectedItem.getLastPathPart) {
+						_pathContainer.addChild(selectedItem.getLastPathPart().movePoint);
+					}
+				}
+		}
+		
 		private function createItemsPanel():void {
 			_itemsPanel = new ItemsPanel;
 			_itemsPanel.visible = false;
@@ -108,9 +139,9 @@ import view.panel.OptionsPanel;
 		}
 		
 		private function onEnterFrame(event:Event):void {
-				if (_draggedItem) {
-					_draggedItem.x = (int(stage.mouseX/CELL_WIDTH)) * CELL_WIDTH - _draggedItem.width;
-					_draggedItem.y = (int(stage.mouseY/CELL_WIDTH)) * CELL_WIDTH - _draggedItem.height;
+				if (_selectedItem) {
+					_selectedItem.x = (int(stage.mouseX/CELL_WIDTH)) * CELL_WIDTH - _selectedItem.width;
+					_selectedItem.y = (int(stage.mouseY/CELL_WIDTH)) * CELL_WIDTH - _selectedItem.height;
 				}
 		}
 		
@@ -120,13 +151,13 @@ import view.panel.OptionsPanel;
 		}
 		
 		private function onObstacleMouseUp(event:MouseEvent):void {
-			_draggedItem = null;
+			_selectedItem = null;
 		}
 		private function onObstacleMouseDown(event:MouseEvent):void {
-			_draggedItem = event.target as ObstacleItem;
-			if (_draggedItem.filters != SELECTED_OBSTACLE_FILTERS) {
+			_selectedItem = event.target as ObstacleItem;
+			if (_selectedItem.filters != SELECTED_OBSTACLE_FILTERS) {
 				unselectPreviousObstacle();
-				_draggedItem.filters = SELECTED_OBSTACLE_FILTERS;
+				_selectedItem.filters = SELECTED_OBSTACLE_FILTERS;
 			}
 		}
 		
