@@ -37,6 +37,7 @@ public class GameController extends EventDispatcher implements IController {
 		private var _mousePoints:Vector.<Point>;
 		private var _drawContainer:Sprite;
 		private var _endWindow:Sprite;
+		private var _feedbackSent:Boolean = false;
 		private var _walls:Sprite;
 		private var _drawingController:DrawingController;
 
@@ -220,14 +221,27 @@ public class GameController extends EventDispatcher implements IController {
 
 			_endWindow = createEndWindow(win);
 			//_endWindow.addChild(createTextField(win ? "you win" : "you lose", -20, -5));
-			_endWindow.addEventListener(MouseEvent.CLICK, onEndWindowClick);
 			_gameContainer.addChild(_endWindow);
 		}
 
 		private function createEndWindow(win:Boolean):Sprite {
-			var result:Sprite = win ? new WinWindowView() : new LoseWindowView();
-			result.x = Main.WIDTH/2;
-			result.y = Main.HEIGHT/2;
+			var result:Sprite;
+			if (!_feedbackSent) {
+				_feedbackSent = true;
+				var gameResult:Sprite = win ? new WinWindowView() : new LoseWindowView();
+				var feedback:FeedBack = new FeedBack();
+				feedback.x = Main.WIDTH/2-feedback.width/2;
+				feedback.y = Main.HEIGHT/2-feedback.height/2;
+				gameResult.x =  feedback.width/2;
+				feedback.addChild(gameResult);
+				feedback.postBtn.addEventListener(MouseEvent.CLICK, onEndWindowClick);
+				result = feedback;
+			} else {
+				result = win ? new WinWindowView() : new LoseWindowView();
+				result.x = Main.WIDTH/2;
+				result.y = Main.HEIGHT/2;
+				result.addEventListener(MouseEvent.CLICK, onEndWindowClick);
+			}
 			return result;
 		}
 

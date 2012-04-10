@@ -9,6 +9,8 @@ import game.event.ControllerActionListener;
 
 import mochi.as3.MochiServices;
 
+import rpc.GameRpc;
+
 [SWF(width=600, height=600, frameRate=60)]
 	
 public class Main extends Sprite {
@@ -29,6 +31,8 @@ public class Main extends Sprite {
 		Security.allowDomain("*");
 		Security.allowInsecureDomain("*");
 		Security.allowDomain("http://www.mochiads.com/static/lib/services/");
+
+		GameRpc.instance.init("localhost", 8080);
 
 		MochiServices.connect(_mochiads_game_id, root, onMochiConnectError);
 		gameContainer = new Sprite;
