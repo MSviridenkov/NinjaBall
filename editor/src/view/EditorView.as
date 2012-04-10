@@ -36,6 +36,8 @@ import view.panel.OptionsPanel;
 		private var _itemsPanel:ItemsPanel;
 		private var _optionsPanel:OptionsPanel;
 		
+		private var _mouseDown:Boolean;
+		
 		private const CELL_WIDTH:int = 20;
 		private const CELLS_NUM:int = 30;
 		private const SELECTED_OBSTACLE_FILTERS:Array = [new GlowFilter(0)];
@@ -44,6 +46,7 @@ import view.panel.OptionsPanel;
 			_model = model;
 			_container = container;
 			_pathContainer = new Sprite();
+			_mouseDown = false;
 			init();
 		}
 
@@ -99,7 +102,7 @@ import view.panel.OptionsPanel;
 						fromPoint = new Point(selectedItem.getLastPathPart().movePoint.x,
 																	selectedItem.getLastPathPart().movePoint.y);
 					} else {
-						fromPoint = new Point(selectedItem.x, selectedItem.y);
+						fromPoint = new Point(selectedItem.x + selectedItem.width, selectedItem.y + selectedItem.height);
 					}
 					var pathPart:PathPart = new PathPart(fromPoint, new Point(cell.x + cell.width / 2, cell.y + cell.height / 2));
 					selectedItem.addPathPart(pathPart);
@@ -139,7 +142,7 @@ import view.panel.OptionsPanel;
 		}
 		
 		private function onEnterFrame(event:Event):void {
-				if (_selectedItem) {
+				if (_selectedItem && _mouseDown) {
 					_selectedItem.x = (int(stage.mouseX/CELL_WIDTH)) * CELL_WIDTH - _selectedItem.width;
 					_selectedItem.y = (int(stage.mouseY/CELL_WIDTH)) * CELL_WIDTH - _selectedItem.height;
 				}
@@ -151,13 +154,14 @@ import view.panel.OptionsPanel;
 		}
 		
 		private function onObstacleMouseUp(event:MouseEvent):void {
-			_selectedItem = null;
+			_mouseDown = false;
 		}
 		private function onObstacleMouseDown(event:MouseEvent):void {
 			_selectedItem = event.target as ObstacleItem;
 			if (_selectedItem.filters != SELECTED_OBSTACLE_FILTERS) {
 				unselectPreviousObstacle();
 				_selectedItem.filters = SELECTED_OBSTACLE_FILTERS;
+				_mouseDown = true;
 			}
 		}
 		

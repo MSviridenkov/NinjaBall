@@ -17,15 +17,20 @@ package view.obstacle {
 		
 		private function createWeight(from:Point, to:Point):void {
 			weight = new Sprite();
-			weight.graphics.lineStyle(1, 0x0facb3);
-			weight.graphics.moveTo(from.x, from.y);
-			weight.graphics.lineTo(to.x, to.y);
+			weight.x = from.x;
+			weight.y = from.y;
+			weight.graphics.lineStyle(2, 0x0333b3);
+			//weight.graphics.moveTo(from.x, from.y);
+			weight.graphics.lineTo(to.x - from.x, to.y - from.y);
 		}
 		
 		private function createMovePoint(point:Point):void {
 			movePoint = new Sprite();
+			movePoint.x = point.x;
+			movePoint.y = point.y;
 			movePoint.graphics.beginFill(0xf3543a);
-			weight.graphics.drawCircle(point.x, point.y, 10);
+			movePoint.graphics.drawCircle(0, 0, 10);
+			movePoint.graphics.endFill();
 		}
 		
 	}
