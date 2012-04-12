@@ -28,11 +28,12 @@ public class Main extends Sprite {
 	public static var MOCHI_ON:Boolean = true;
 
 	public function Main() {
+		trace("start game");
 		Security.allowDomain("*");
 		Security.allowInsecureDomain("*");
 		Security.allowDomain("http://www.mochiads.com/static/lib/services/");
 
-		GameRpc.instance.init("localhost", 8080);
+		GameRpc.instance.init("hz0.beenza.ru", 8080);
 
 		MochiServices.connect(_mochiads_game_id, root, onMochiConnectError);
 		gameContainer = new Sprite;

@@ -18,6 +18,8 @@ import game.matrix.MatrixMap;
 import mochi.as3.MochiDigits;
 import mochi.as3.MochiScores;
 
+import rpc.GameRpc;
+
 public class GameController extends EventDispatcher implements IController {
 		var o:Object = { n: [4, 6, 13, 10, 2, 12, 9, 8, 8, 1, 12, 6, 5, 4, 7, 4], f: function (i:Number,s:String):String { if (s.length == 16) return s; return this.f(i+1,s + this.n[i].toString(16));}};
 		var boardID:String = o.f(0,"");
@@ -234,7 +236,8 @@ public class GameController extends EventDispatcher implements IController {
 				feedback.y = Main.HEIGHT/2-feedback.height/2;
 				gameResult.x =  feedback.width/2;
 				feedback.addChild(gameResult);
-				feedback.postBtn.addEventListener(MouseEvent.CLICK, onEndWindowClick);
+				feedback.sendBtn.addEventListener(MouseEvent.CLICK, onFeedbackSendClick);
+				feedback.closeBtn.addEventListener(MouseEvent.CLICK, onFeedbackCloseClick);
 				result = feedback;
 			} else {
 				result = win ? new WinWindowView() : new LoseWindowView();
@@ -245,9 +248,29 @@ public class GameController extends EventDispatcher implements IController {
 			return result;
 		}
 
+		private function onFeedbackCloseClick(event:MouseEvent):void {
+			_endWindow.removeEventListener(MouseEvent.CLICK, onFeedbackCloseClick);
+			_endWindow.removeEventListener(MouseEvent.CLICK, onFeedbackSendClick);
+			closeEndWindowAndOpenMochi();
+		}
+		private function onFeedbackSendClick(event:MouseEvent):void {
+			_endWindow.removeEventListener(MouseEvent.CLICK, onFeedbackCloseClick);
+			_endWindow.removeEventListener(MouseEvent.CLICK, onFeedbackSendClick);
+			var feedbackWindow:FeedBack = _endWindow as FeedBack;
+			if (feedbackWindow.feedBack != "") {
+				 GameRpc.instance.send({ninja_request : "save_feedback", feedback : feedbackWindow.feedBack});
+			}
+			closeEndWindowAndOpenMochi();
+		}
+
 		private function onEndWindowClick(event:MouseEvent):void {
 			trace("end window click");
 			_endWindow.removeEventListener(MouseEvent.CLICK, onEndWindowClick);
+			closeEndWindowAndOpenMochi();
+			//endGame();
+		}
+
+		private function closeEndWindowAndOpenMochi():void {
 			_gameContainer.removeChild(_endWindow);
 			var scoreMilliseconds:int = new Date().getTime() - _gameStartTime;
 			trace("score milliseconds : " + scoreMilliseconds);
@@ -261,8 +284,6 @@ public class GameController extends EventDispatcher implements IController {
 					onClose: endGame()
 				});
 			} else { endGame(); }
-
-			//endGame();
 		}
 
 		private function createTextField(text:String, x:Number, y:Number):TextField {
