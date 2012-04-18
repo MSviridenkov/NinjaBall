@@ -6,8 +6,6 @@ import flash.filters.GlowFilter;
 
 import game.event.ControllerActionListener;
 
-import mx.effects.Glow;
-
 public class Menu extends EventDispatcher implements IController {
 	private var _gameContainer:Sprite;
 	private var _menuContainer:Sprite;
