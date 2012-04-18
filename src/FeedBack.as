@@ -1,11 +1,14 @@
 package  
 {
-	import fl.controls.Button;
+import com.greensock.TweenLite;
+
+import fl.controls.Button;
 	import fl.controls.TextInput;
 	import flash.display.MovieClip;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
-	import flash.text.TextField;
+import flash.filters.ColorMatrixFilter;
+import flash.text.TextField;
 	import flash.text.TextFieldAutoSize;
 	import flash.text.TextFieldType;
 	import flash.text.TextFormat;
@@ -18,9 +21,13 @@ package
 		private var _border:FeedWindowView;
 		private var _feedback:TextInput;
 		private var _txt:TextField;
-		public function FeedBack() 
+
+		private const COLORMATRIX_FILTER:ColorMatrixFilter = new ColorMatrixFilter();
+
+		public function FeedBack()
 		{
 			super();
+			createColorMatrixFilter();
 			this.x = 100; this.y = 100;
 			init();
 		}
@@ -34,7 +41,7 @@ package
 			_border.closeBtn.buttonMode = true;
 			this.addChild(_border);
 
-			_border.closeBtn.gotoAndStop(2);
+			_border.closeBtn.gotoAndStop(1);
 			_border.sendBtn.gotoAndStop(2);
 			
 			addFeedBack();
@@ -57,12 +64,12 @@ package
 		}
 		private function onCloseOut(e:MouseEvent):void 
 		{
-			_border.closeBtn.gotoAndStop(2);
+			_border.closeBtn.filters = [];
 		}
 		
 		private function onCloseOver(e:MouseEvent):void 
 		{
-			_border.closeBtn.gotoAndStop(1);
+			_border.closeBtn.filters = [COLORMATRIX_FILTER];
 		}
 		private function addFeedBack():void {
 			_feedback = new TextInput;
@@ -84,6 +91,13 @@ package
 			_txt.y = _feedback.y - 20;
 			_border.addChild(_txt);
 		}
-	}
 
+		private function createColorMatrixFilter():void {
+			COLORMATRIX_FILTER.matrix = [1, 0, 0, 0.15, 0,
+													0, 1, 0, 0.15, 0,
+													0, 0, 1, 0.15, 0,
+													0, 0, 0, 1, 0];
+		}
+
+}
 }

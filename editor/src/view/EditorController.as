@@ -1,19 +1,17 @@
 package view 
 {
-	import events.ItemPanelEvent;
-	import fl.controls.Button;
-	import flash.display.SpreadMethod;
-	import flash.display.Sprite;
-	import flash.display.Stage;
-	import flash.events.Event;
-	import flash.events.KeyboardEvent;
-	import flash.events.MouseEvent;
-	import flash.filters.GlowFilter;
-	import flash.geom.Point;
-	import flash.ui.Keyboard;
-	import model.EditorModel;
-	import model.IDItems;
-	import view.cell.Cell;
+import events.ItemPanelEvent;
+import flash.display.Sprite;
+import flash.display.Stage;
+import flash.events.Event;
+import flash.events.KeyboardEvent;
+import flash.events.MouseEvent;
+import flash.filters.GlowFilter;
+import flash.geom.Point;
+import flash.ui.Keyboard;
+import model.EditorModel;
+import model.IDItems;
+import view.cell.Cell;
 import view.obstacle.ObstacleItem;
 import view.obstacle.PathPart;
 import view.obstacle.SquareObstacle;
@@ -24,10 +22,9 @@ import view.panel.OptionsPanel;
 	 * ...
 	 * @author ProBigi
 	 */
-	public class EditorView extends Sprite implements IObjectController
+	public class EditorController extends Sprite implements IObjectController
 	{
 		private var _model:EditorModel;
-		private var _container:Stage;
 		private var _grid:Sprite;
 		private var _pathContainer:Sprite;
 		private var _cells:Vector.<Cell>;
@@ -42,13 +39,16 @@ import view.panel.OptionsPanel;
 		private const CELLS_NUM:int = 30;
 		private const SELECTED_OBSTACLE_FILTERS:Array = [new GlowFilter(0)];
 		
-		public function EditorView(model:model.EditorModel, container:Stage) {
+		public function EditorController(model:EditorModel) {
 			_model = model;
-			_container = container;
 			_pathContainer = new Sprite();
 			_mouseDown = false;
-			init();
+			addEventListener(Event.ADDED_TO_STAGE, onAddedToStage);
 		}
+
+	private function onAddedToStage(event:Event):void {
+		init();
+	}
 
 		public function init():void {
 			createGrid();
@@ -64,16 +64,16 @@ import view.panel.OptionsPanel;
 			while (len > 0) { this.removeChildAt(0); len--; }
 		}
 		private function addListeners():void {
-			_container.addEventListener(KeyboardEvent.KEY_DOWN, onShowItems);
-			_container.addEventListener(KeyboardEvent.KEY_DOWN, onShowOptions);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, onShowItems);
+			stage.addEventListener(KeyboardEvent.KEY_DOWN, onShowOptions);
 			_itemsPanel.cancelBtn.addEventListener(MouseEvent.CLICK, onCloseItems);
-			_container.addEventListener(Event.ENTER_FRAME, onEnterFrame);
+			stage.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		private function removeListeners():void {
-			_container.removeEventListener(KeyboardEvent.KEY_DOWN, onShowItems);
-			_container.removeEventListener(KeyboardEvent.KEY_DOWN, onShowOptions);
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN, onShowItems);
+			stage.removeEventListener(KeyboardEvent.KEY_DOWN, onShowOptions);
 			_itemsPanel.cancelBtn.removeEventListener(MouseEvent.CLICK, onCloseItems);
-			_container.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
+			stage.removeEventListener(Event.ENTER_FRAME, onEnterFrame);
 		}
 		
 		private function createGrid():void {

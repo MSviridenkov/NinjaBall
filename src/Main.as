@@ -1,6 +1,5 @@
 package {
 import flash.display.Sprite;
-	import flash.events.Event;
 import flash.system.Security;
 
 import game.GameController;
@@ -25,7 +24,7 @@ public class Main extends Sprite {
 	public static const WIDTH:int = 600;
 	public static const HEIGHT:int = 600;
 
-	public static var MOCHI_ON:Boolean = true;
+	public static var MOCHI_ON:Boolean = false;
 
 	public function Main() {
 		trace("start game");
@@ -35,7 +34,7 @@ public class Main extends Sprite {
 
 		GameRpc.instance.init("hz0.beenza.ru", 8080);
 
-		MochiServices.connect(_mochiads_game_id, root, onMochiConnectError);
+		//MochiServices.connect(_mochiads_game_id, root, onMochiConnectError);
 		gameContainer = new Sprite;
 		addChild(gameContainer);
 		_menuController = new Menu(gameContainer);
