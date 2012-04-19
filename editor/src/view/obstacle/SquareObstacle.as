@@ -29,6 +29,14 @@ public class SquareObstacle extends ObstacleItem {
 		}
 	}
 
+	public function getMovePointsForJSON():Array {
+		var result:Array = new Array();
+		for each (var part:PathPart in _pathParts) {
+			result.push({x: part.movePoint.x, y: part.movePoint.y});
+		}
+		return result;
+	}
+
 	public function getPathPartAndUpper(pathPart):Vector.<PathPart> {
 		var index:int = _pathParts.indexOf(pathPart);
 		var result:Vector.<PathPart> = new Vector.<PathPart>();
