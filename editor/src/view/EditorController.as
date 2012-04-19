@@ -11,6 +11,8 @@ import flash.events.KeyboardEvent;
 import flash.events.MouseEvent;
 import flash.filters.GlowFilter;
 import flash.geom.Point;
+import flash.net.FileReference;
+import flash.system.System;
 import flash.ui.Keyboard;
 import model.EditorModel;
 import model.IDItems;
@@ -176,6 +178,8 @@ private function removePathPart(pathPart:PathPart):void {
 			}
 		}
 		trace("json map : " + JSON.encode(map));
+		var fileReference:FileReference = new FileReference();
+		fileReference.save(JSON.encode(map), "map.json");
 	}
 
 	private function onEnterFrame(event:Event):void {
