@@ -15,6 +15,7 @@ package view.obstacle
 			var result:ObstacleItem;
 			switch (type) {
 				case IDItems.CUBE : result = new SquareObstacle(); break;
+				case IDItems.MILL : result = new MillObstacle(); break;
 				default: return null;
 			}
 			return result;

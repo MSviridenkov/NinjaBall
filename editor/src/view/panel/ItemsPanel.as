@@ -1,10 +1,18 @@
 package view.panel
 {
 	import com.greensock.TweenLite;
-	import fl.controls.Button;
+import com.greensock.TweenMax;
+
+import fl.controls.Button;
 	import flash.display.Sprite;
 	import flash.events.MouseEvent;
-	import view.obstacle.ObstacleItem;
+import flash.filters.GlowFilter;
+
+import mx.effects.Glow;
+
+import view.obstacle.MillObstacle;
+
+import view.obstacle.ObstacleItem;
 	import view.obstacle.SquareObstacle;
 	import events.ItemPanelEvent;
 	/**
@@ -18,6 +26,8 @@ package view.panel
 		private var _items:Vector.<ObstacleItem>;
 
 		private var _customization:ItemsPanelCustomization;
+
+		private var GLOW_FILTER:GlowFilter = new GlowFilter(0xfaa43c, 1, 6, 6, 10, 1, true);
 		
 		public function ItemsPanel() {
 			init();
@@ -48,13 +58,14 @@ package view.panel
 		private function createItems():void {
 			_items = new Vector.<ObstacleItem>();
 			_items.push(new SquareObstacle());
+			_items.push(new MillObstacle());
 			addItemsToView();
 			addItemsListeners();
 		}
 		private function addItemsToView():void {
 			for (var i:int = 0; i < _items.length; ++i) {
-				_items[i].x = 10 + i * (_items[i].width + 10);
-				_items[i].y = 10;
+				_items[i].x = 30 + i * (_items[i].width + 10);
+				_items[i].y = 50;
 				_items[i].alpha = .8;
 				this.addChild(_items[i]);
 			}
@@ -68,10 +79,10 @@ package view.panel
 		}
 		
 		private function onItemMouseOver(event:MouseEvent):void {
-			TweenLite.to(event.target, .2, { scaleX : 1.2, scaleY : 1.2, alpha : 1} );
+			TweenMax.to(event.target, .3, {glowFilter:{color: 0xfaa43c, alpha : 1, blurX: 20, blurY: 20, inner: true}});
 		}
 		private function onItemMouseOut(event:MouseEvent):void {
-			TweenLite.to(event.target, .2, { scaleX : 1, scaleY : 1, alpha : .8} );
+			TweenMax.to(event.target, .3, {glowFilter:{alpha : 0, blurX: 20, blurY: 20, inner: true}});
 		}
 		private function onItemClick(event:MouseEvent):void {
 			dispatchEvent(new ItemPanelEvent(ItemPanelEvent.ADD_ITEM, event.target as ObstacleItem));

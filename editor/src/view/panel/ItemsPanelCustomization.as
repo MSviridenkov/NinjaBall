@@ -40,7 +40,6 @@ public class ItemsPanelCustomization {
 			_border.graphics.beginFill(0xFFFFFF);
 			_border.graphics.drawRect(0, 0, 400, 250);
 			_border.graphics.endFill();
-			_border.x = 20; _border.y = 20;
 			_itemsPanel.addChild(_border);
 		}
 		private function createButtons():void {

@@ -1,6 +1,8 @@
 package view 
 {
 import events.ItemPanelEvent;
+import events.PathPartEvent;
+
 import flash.display.Sprite;
 import flash.display.Stage;
 import flash.events.Event;
@@ -14,6 +16,8 @@ import model.IDItems;
 import view.cell.Cell;
 import view.obstacle.ObstacleItem;
 import view.obstacle.PathPart;
+import view.obstacle.PathPart;
+import view.obstacle.SquareObstacle;
 import view.obstacle.SquareObstacle;
 import view.panel.ItemsPanel;
 import view.panel.OptionsPanel;
@@ -37,7 +41,7 @@ import view.panel.OptionsPanel;
 		
 		private const CELL_WIDTH:int = 20;
 		private const CELLS_NUM:int = 30;
-		private const SELECTED_OBSTACLE_FILTERS:Array = [new GlowFilter(0)];
+		private const SELECTED_OBSTACLE_FILTER:GlowFilter = new GlowFilter(0);
 		
 		public function EditorController(model:EditorModel) {
 			_model = model;
@@ -102,9 +106,10 @@ import view.panel.OptionsPanel;
 						fromPoint = new Point(selectedItem.getLastPathPart().movePoint.x,
 																	selectedItem.getLastPathPart().movePoint.y);
 					} else {
-						fromPoint = new Point(selectedItem.x + selectedItem.width, selectedItem.y + selectedItem.height);
+						fromPoint = new Point(selectedItem.x, selectedItem.y);
 					}
 					var pathPart:PathPart = new PathPart(fromPoint, new Point(cell.x + cell.width / 2, cell.y + cell.height / 2));
+					pathPart.addEventListener(PathPartEvent.REMOVE, onPathPartRemoveRequest);
 					selectedItem.addPathPart(pathPart);
 					_pathContainer.addChild(pathPart.weight);
 					_pathContainer.addChild(pathPart.movePoint);
@@ -113,9 +118,28 @@ import view.panel.OptionsPanel;
 					}
 				}
 		}
+
+	private function onPathPartRemoveRequest(event:PathPartEvent):void {
+		removePathPart(event.pathPart);
+	}
+
+	private function removePathPart(pathPart:PathPart):void {
+		if (!_selectedItem || !(_selectedItem is SquareObstacle)) { return; }
+		var squareItem:SquareObstacle = _selectedItem as SquareObstacle;
+		var pathParts:Vector.<PathPart> = squareItem.getPathPartAndUpper(pathPart);
+		for each (var pathPartItem:PathPart in pathParts) {
+			if (_pathContainer.contains(pathPartItem.movePoint)) {
+				_pathContainer.removeChild(pathPartItem.movePoint);
+				_pathContainer.removeChild(pathPartItem.weight);
+			}
+		}
+		squareItem.removePathPartAndUpper(pathPart);
+	}
 		
 		private function createItemsPanel():void {
-			_itemsPanel = new ItemsPanel;
+			_itemsPanel = new ItemsPanel();
+			_itemsPanel.x = 10;
+			_itemsPanel.y = 10;
 			_itemsPanel.visible = false;
 			_itemsPanel.addEventListener(ItemPanelEvent.ADD_ITEM, onAddItemFromItemsPanel);
 			this.addChild(_itemsPanel);
@@ -143,8 +167,11 @@ import view.panel.OptionsPanel;
 		
 		private function onEnterFrame(event:Event):void {
 				if (_selectedItem && _mouseDown) {
-					_selectedItem.x = (int(stage.mouseX/CELL_WIDTH)) * CELL_WIDTH - _selectedItem.width;
-					_selectedItem.y = (int(stage.mouseY/CELL_WIDTH)) * CELL_WIDTH - _selectedItem.height;
+					_selectedItem.x = (int(stage.mouseX/CELL_WIDTH)) * CELL_WIDTH;
+					_selectedItem.y = (int(stage.mouseY/CELL_WIDTH)) * CELL_WIDTH;
+					if (_selectedItem is SquareObstacle) {
+						(_selectedItem as SquareObstacle).updateFirstPathPart();
+					}
 				}
 		}
 		
@@ -158,18 +185,16 @@ import view.panel.OptionsPanel;
 		}
 		private function onObstacleMouseDown(event:MouseEvent):void {
 			_selectedItem = event.target as ObstacleItem;
-			if (_selectedItem.filters != SELECTED_OBSTACLE_FILTERS) {
+			if (_selectedItem.filters.indexOf(SELECTED_OBSTACLE_FILTER) == -1) {
 				unselectPreviousObstacle();
-				_selectedItem.filters = SELECTED_OBSTACLE_FILTERS;
+				_selectedItem.filters = [SELECTED_OBSTACLE_FILTER];
 				_mouseDown = true;
 			}
 		}
 		
 		private function unselectPreviousObstacle():void {
 			for each(var item:ObstacleItem in _items) {
-				if (item.filters == SELECTED_OBSTACLE_FILTERS) {
-					item.filters = [];
-				}
+				item.filters = [];
 			}
 		}
 		
