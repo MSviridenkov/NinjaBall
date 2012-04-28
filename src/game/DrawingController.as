@@ -134,7 +134,7 @@ public class DrawingController extends EventDispatcher{
 			_drawingContainer.addChild(pathPart);
 		}
 		addPathPartVectorToDictionary(point, pathPartVector);
-		dispatchEvent(new DrawingControllerEvent(DrawingControllerEvent.ADD_PATH_POINT, new Point(pathPart.x, pathPart.y)));
+		//dispatchEvent(new DrawingControllerEvent(DrawingControllerEvent.ADD_PATH_POINT, new Point(pathPart.x, pathPart.y)));
 	}
 		
 		private function needDrawLine(point:Point):Boolean {

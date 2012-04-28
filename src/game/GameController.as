@@ -1,24 +1,26 @@
 package game {
 	import com.greensock.TweenMax;
+	import com.greensock.easing.Linear;
 	
 	import flash.display.BitmapData;
 	import flash.display.Sprite;
 	import flash.events.Event;
-import flash.events.EventDispatcher;
-import flash.events.MouseEvent;
+	import flash.events.EventDispatcher;
+	import flash.events.MouseEvent;
 	import flash.geom.ColorTransform;
 	import flash.geom.Point;
-import flash.text.TextField;
-import flash.text.TextFieldAutoSize;
-
-import game.event.ControllerActionListener;
-
-import game.matrix.MatrixMap;
-
-import mochi.as3.MochiDigits;
-import mochi.as3.MochiScores;
-
-import rpc.GameRpc;
+	import flash.text.TextField;
+	import flash.text.TextFieldAutoSize;
+	
+	import game.event.ControllerActionListener;
+	import game.matrix.MatrixMap;
+	
+	import mochi.as3.MochiDigits;
+	import mochi.as3.MochiScores;
+	
+	import mx.events.MoveEvent;
+	
+	import rpc.GameRpc;
 
 public class GameController extends EventDispatcher implements IController {
 		var o:Object = { n: [4, 6, 13, 10, 2, 12, 9, 8, 8, 1, 12, 6, 5, 4, 7, 4], f: function (i:Number,s:String):String { if (s.length == 16) return s; return this.f(i+1,s + this.n[i].toString(16));}};
@@ -31,11 +33,11 @@ public class GameController extends EventDispatcher implements IController {
 		private var _windowController:WindowController;
 		
 		private var _ball:Sprite;
-		private var _canDraw:Boolean;
+		private var _canAddPoints:Boolean;
 		private var _gameState:uint;
 		private var _path:Sprite;
 		private var _finishSquare:Sprite;
-		private var _currentMousePoints:Vector.<Point>;
+		//private var _currentMousePoints:Vector.<Point>;
 		private var _mousePoints:Vector.<Point>;
 		private var _drawContainer:Sprite;
 		private var _endWindow:Sprite;
@@ -50,6 +52,7 @@ public class GameController extends EventDispatcher implements IController {
 		private const STATE_MOVE:uint = 0;
 		private const STATE_DRAW:uint = 1;
 		private const STATE_STOP:uint = 2;
+		private const BALL_SPEED:Number = 70;
 
 		public function GameController(container:Sprite) {
 			_gameContainer = container;
@@ -70,7 +73,7 @@ public class GameController extends EventDispatcher implements IController {
 			_gameStartTime = new Date().getTime();
 			_drawingController.addListeners();
 			_mousePoints = new Vector.<Point>;
-			_currentMousePoints = new Vector.<Point>;
+			//_currentMousePoints = new Vector.<Point>;
 			_squareController = new SquareController(_gameContainer);
 			_crossController = new CrossController(_gameContainer);
 			drawSquareOnContainer();
@@ -88,7 +91,7 @@ public class GameController extends EventDispatcher implements IController {
 			_gameContainer.addEventListener(MouseEvent.MOUSE_UP, onMouseUp);
 			_gameContainer.addEventListener(Event.ENTER_FRAME, onEnterFrame);
 			_gameState = STATE_DRAW;
-			_canDraw = false;
+			_canAddPoints = false;
 		}
 
 		public function close():void {
@@ -146,49 +149,44 @@ public class GameController extends EventDispatcher implements IController {
 		private function onMouseDown(event:MouseEvent):void {
 			if ((_ball.x - _ball.width/2) < event.stageX && event.stageX < (_ball.x + _ball.width/2) &&
 				(_ball.y - _ball.height/2) < event.stageY && event.stageY < (_ball.y + _ball.height/2)) {
-				_canDraw = true;
+				_canAddPoints = true;
 				pauseGame();
 			}
 			_path.graphics.moveTo(event.stageX, event.stageY);
 		}
 		
 		private function onMouseMove(event:MouseEvent):void {
-			//for each (var stone:Sprite in _matrixMap.stones) {
-			//	if (_path.hitTestObject(stone)) {
-			//	}
-			//}
-			if (_canDraw) {
-				_currentMousePoints.unshift(new Point(event.stageX, event.stageY));
-				//_path.graphics.lineStyle(5, 0x002FFF);
-				//_path.graphics.lineTo(_currentMousePoints[0].x, _currentMousePoints[0].y);
+			var point = new Point(event.stageX, event.stageY);
+			if (_canAddPoints) {
+				if (!_mousePoints) {return; }
+				_mousePoints.push(point);
 			}
 		}
 		
 		private function onMouseUp(event:MouseEvent):void {
-			if (_gameState == STATE_STOP || _canDraw == false) { return; }
-			_canDraw = false;
+			if (_gameState == STATE_STOP || _canAddPoints == false) { return; }
+			_canAddPoints = false;
 			_gameState = STATE_MOVE;
 			resumeGame();
+			moving();
+			
+			if (_gameState == STATE_MOVE) {
+				if (!_mousePoints || _mousePoints.length == 0) {
+					openEndWindow(false);
+					return;
+				}
+			}
 		}
 		
 		/*Enter Frame*/
 		
 		private function onEnterFrame(event:Event):void {
 			if (_gameState == STATE_DRAW) {
-				if (!_mousePoints || _currentMousePoints.length == 0 ) {return; }
-				_mousePoints.push(_currentMousePoints[0]);
-				_drawingController.drawPathToCurrentPoint(_currentMousePoints[0]);
+				if (_mousePoints.length == 0) {return; }
+				_drawingController.drawPathToCurrentPoint(_mousePoints[_mousePoints.length-1]);
+				//trace (_mousePoints);
 			}
 			if (_gameState == STATE_MOVE) {
-				if (!_mousePoints || _mousePoints.length == 0) {
-					openEndWindow(false);
-					return;
-				}
-				//_drawingController.removePointsAroundNinja();
-				const point:Point = _mousePoints.shift();
-				_ball.x = point.x;
-				_ball.y = point.y;
-				_drawingController.removePathPartByMousePoint(point);
 				if (checkObjectsHitBall(new Point(_ball.x, _ball.y))) {
 					openEndWindow(false);
 				} else if (checkForFinish()) {
@@ -201,6 +199,15 @@ public class GameController extends EventDispatcher implements IController {
 		}
 		
 		/*Functions*/
+		
+		private function moving():void {
+			if (_mousePoints.length !== 0) {
+				var point:Point = _mousePoints.shift();
+				var distation:Number = Math.sqrt((point.x-_ball.x)*(point.x-_ball.x) + (point.y-_ball.y)*(point.y-_ball.y));
+				var time:Number = distation/BALL_SPEED;
+				TweenMax.to(_ball, time, {x: point.x, y: point.y, ease: Linear.easeNone, onComplete: function():void { moving(); trace(point); _drawingController.removePathPartByMousePoint(point);}});
+			}
+		}
 		
 		private function addWindow():void {
 			_windowController = new WindowController(_gameContainer);
@@ -219,7 +226,7 @@ public class GameController extends EventDispatcher implements IController {
 		private function openEndWindow(win:Boolean):void {
 			_win = win;
 			_gameState = STATE_STOP;
-			_canDraw = false;
+			_canAddPoints = false;
 
 			_endWindow = createEndWindow(win);
 			//_endWindow.addChild(createTextField(win ? "you win" : "you lose", -20, -5));
