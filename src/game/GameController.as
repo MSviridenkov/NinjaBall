@@ -99,6 +99,7 @@ public class GameController extends EventDispatcher implements IController {
 			_drawingController.clear();
 			_squareController.remove();
 			_crossController.remove();
+			_bonusController.remove();
 			if (_drawContainer.contains(_path)) { _drawContainer.removeChild(_path); }
 			if (_gameContainer.contains(_drawContainer)) { _gameContainer.removeChild(_drawContainer); }
 			if (_gameContainer.contains(_ball)) { _gameContainer.removeChild(_ball); }
@@ -192,9 +193,8 @@ public class GameController extends EventDispatcher implements IController {
 				} else if (checkForFinish()) {
 					openEndWindow(true);
 				}
-				if (checkForSpeedBonus()) {
-					_ballSpeed += 50;
-				}
+				checkForSpeedBonus();
+				checkForScaleBonus();
 			}
 			/*if (_gameState == "stop") {
 				pauseGame();
@@ -347,14 +347,25 @@ public class GameController extends EventDispatcher implements IController {
 			return (_ball.hitTestObject(_finishSquare));
 		}
 		
-		private function checkForSpeedBonus():Boolean {
-			var result:Boolean = false;
+		private function checkForSpeedBonus():void {
 			for each (var speedBonus in _bonusController.speedBonusVector) {
 				if (_ball.hitTestObject(speedBonus)) {
-					result = true;
+					_gameContainer.removeChild(speedBonus);
+					_bonusController.speedBonusVector.splice(_bonusController.speedBonusVector.indexOf(speedBonus), 1);
+					_ballSpeed += 50;
 				}
 			}
-			return result;
+		}
+		
+		private function checkForScaleBonus():void {
+			for each (var scaleBonus in _bonusController.scaleBonusVector) {
+				if (_ball.hitTestObject(scaleBonus)) {
+					_gameContainer.removeChild(scaleBonus);
+					_bonusController.scaleBonusVector.splice(_bonusController.scaleBonusVector.indexOf(scaleBonus), 1);
+					_ball.scaleX-=0.3;
+					_ball.scaleY-=0.3;
+				}
+			}
 		}
 		
 	}
