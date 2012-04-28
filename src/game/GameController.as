@@ -37,22 +37,22 @@ public class GameController extends EventDispatcher implements IController {
 		private var _gameState:uint;
 		private var _path:Sprite;
 		private var _finishSquare:Sprite;
-		//private var _currentMousePoints:Vector.<Point>;
 		private var _mousePoints:Vector.<Point>;
 		private var _drawContainer:Sprite;
 		private var _endWindow:Sprite;
 		private var _feedbackSent:Boolean = false;
 		private var _walls:Sprite;
 		private var _drawingController:DrawingController;
+		private var _bonusController:BonusController;
 
 		private var _win:Boolean;
 
 		private var _gameStartTime:Number;
+		private var _ballSpeed:Number = 100;
 
 		private const STATE_MOVE:uint = 0;
 		private const STATE_DRAW:uint = 1;
 		private const STATE_STOP:uint = 2;
-		private const BALL_SPEED:Number = 70;
 
 		public function GameController(container:Sprite) {
 			_gameContainer = container;
@@ -73,7 +73,7 @@ public class GameController extends EventDispatcher implements IController {
 			_gameStartTime = new Date().getTime();
 			_drawingController.addListeners();
 			_mousePoints = new Vector.<Point>;
-			//_currentMousePoints = new Vector.<Point>;
+			_bonusController = new BonusController(_gameContainer);
 			_squareController = new SquareController(_gameContainer);
 			_crossController = new CrossController(_gameContainer);
 			drawSquareOnContainer();
@@ -192,6 +192,9 @@ public class GameController extends EventDispatcher implements IController {
 				} else if (checkForFinish()) {
 					openEndWindow(true);
 				}
+				if (checkForSpeedBonus()) {
+					_ballSpeed += 50;
+				}
 			}
 			/*if (_gameState == "stop") {
 				pauseGame();
@@ -204,7 +207,7 @@ public class GameController extends EventDispatcher implements IController {
 			if (_mousePoints.length !== 0) {
 				var point:Point = _mousePoints.shift();
 				var distation:Number = Math.sqrt((point.x-_ball.x)*(point.x-_ball.x) + (point.y-_ball.y)*(point.y-_ball.y));
-				var time:Number = distation/BALL_SPEED;
+				var time:Number = distation/_ballSpeed;
 				TweenMax.to(_ball, time, {x: point.x, y: point.y, ease: Linear.easeNone, onComplete: function():void { moving(); trace(point); _drawingController.removePathPartByMousePoint(point);}});
 			}
 		}
@@ -227,6 +230,7 @@ public class GameController extends EventDispatcher implements IController {
 			_win = win;
 			_gameState = STATE_STOP;
 			_canAddPoints = false;
+			pauseGame();
 
 			_endWindow = createEndWindow(win);
 			//_endWindow.addChild(createTextField(win ? "you win" : "you lose", -20, -5));
@@ -342,6 +346,16 @@ public class GameController extends EventDispatcher implements IController {
 		private function checkForFinish():Boolean {
 			return (_ball.hitTestObject(_finishSquare));
 		}
-
+		
+		private function checkForSpeedBonus():Boolean {
+			var result:Boolean = false;
+			for each (var speedBonus in _bonusController.speedBonusVector) {
+				if (_ball.hitTestObject(speedBonus)) {
+					result = true;
+				}
+			}
+			return result;
+		}
+		
 	}
 }
